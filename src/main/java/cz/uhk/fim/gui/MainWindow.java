@@ -15,6 +15,7 @@ public class MainWindow extends javax.swing.JFrame {
     TriangleEditWindow winTri;
     CircleEditWindow winCirc;
     RectangleEditWindow winRect;
+    Custom_object_window winCustom;
 
     MujDrawPanel drawPanel;
     JPanel controlPanel, objectPanel;
@@ -22,7 +23,7 @@ public class MainWindow extends javax.swing.JFrame {
     JLabel labx, laby;
     JList list;
     JScrollPane scList;
-    JButton btCircle, btRectangle, btTriangle;
+    JButton btCircle, btRectangle, btTriangle,btCustom;
     JComboBox<Barva> cbBarva;
     JCheckBox xbFilled;
 
@@ -81,6 +82,8 @@ public class MainWindow extends javax.swing.JFrame {
         controlPanel.add(btRectangle);
         btTriangle = new JButton("Triangle");
         controlPanel.add(btTriangle);
+        btCustom = new JButton("custom");
+        controlPanel.add(btCustom);
         add(controlPanel, BorderLayout.SOUTH);
 
         objectPanel = new JPanel();
@@ -107,6 +110,7 @@ public class MainWindow extends javax.swing.JFrame {
         btCircle.addActionListener(this::btKruhActionPerformed);
         btRectangle.addActionListener(this::btObdelnikActionPerformed);
         btTriangle.addActionListener(this::btTrojuhelnikActionPerformed);
+        btCustom.addActionListener(this::btCustomActionPerformed);
 
         CustomMouseListener mouseListener  = new CustomMouseListener();
         drawPanel.addMouseListener((MouseListener) mouseListener);
@@ -180,6 +184,11 @@ public class MainWindow extends javax.swing.JFrame {
         winCirc.setVisible(true);
     }
 
+    void btCustomActionPerformed(ActionEvent evt) {
+        winCustom = new Custom_object_window(this);
+        winCustom.setVisible(true);
+    }
+
     void btObdelnikActionPerformed(ActionEvent evt) {
         winRect.setVisible(true);
     }
@@ -215,6 +224,17 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     void btCreateCircleActionPerformed(ActionEvent e) {
+        Color color = ((Barva) cbBarva.getSelectedItem()).color();
+        boolean vypln = xbFilled.isSelected();
+        int x =  Integer.parseInt(tfx.getText());
+        int y =  Integer.parseInt(tfy.getText());
+
+        winCirc.setVisible(false);
+        objects.add(new Circle(x,y, color, vypln, winCirc.getR()));
+        repaint();
+    }
+
+    void btCreateCustomActionPerformed(ActionEvent e){
         Color color = ((Barva) cbBarva.getSelectedItem()).color();
         boolean vypln = xbFilled.isSelected();
         int x =  Integer.parseInt(tfx.getText());
