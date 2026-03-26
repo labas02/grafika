@@ -234,7 +234,7 @@ public class MainWindow extends javax.swing.JFrame {
         repaint();
     }
 
-    void btCreateCustomActionPerformed(ActionEvent e){
+    void btCreateCustomActionPerformed(  ){
         Color color = ((Barva) cbBarva.getSelectedItem()).color();
         boolean vypln = xbFilled.isSelected();
         int x =  Integer.parseInt(tfx.getText());

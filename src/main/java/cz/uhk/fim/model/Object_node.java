@@ -7,8 +7,11 @@ public class Object_node extends GraphObject {
 
         protected int width;
         protected int height;
+        protected Point pos;
         protected boolean is_selected;
         protected Color selected_color = Color.ORANGE;
+        protected Object_node previous_node = null;
+        protected Object_node next_node = null;
 
         public int getWidth() {
             return width;
@@ -33,6 +36,22 @@ public class Object_node extends GraphObject {
         public void setFilled(boolean filled) {
             this.filled = filled;
         }
+
+    public Object_node getPrevious_node() {
+        return previous_node;
+    }
+
+    public void setPrevious_node(Object_node previous_node) {
+        this.previous_node = previous_node;
+    }
+
+    public Object_node getNext_node() {
+        return next_node;
+    }
+
+    public void setNext_node(Object_node next_node) {
+        this.next_node = next_node;
+    }
 
     public boolean isIs_selected() {
         return is_selected;
@@ -60,7 +79,12 @@ public class Object_node extends GraphObject {
                 g2.setColor(selected_color);
             }else {
                 g2.setColor(color);
-
+            }
+            if (next_node != null){
+                g.drawLine(next_node.coord.x,next_node.coord.y,coord.x,coord.y);
+            }
+            if (previous_node != null){
+                g.drawLine(previous_node.coord.x,previous_node.coord.y,coord.x,coord.y);
             }
             if (filled)
                 g2.fillRect(coord.x- width /2, coord.y- height /2, width, height);
