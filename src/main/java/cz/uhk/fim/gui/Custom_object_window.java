@@ -17,6 +17,7 @@ import java.util.Vector;
 
 import static java.awt.Color.*;
 import static java.awt.Color.green;
+import static java.awt.MouseInfo.getPointerInfo;
 import static java.awt.event.MouseEvent.*;
 
 public class Custom_object_window extends JFrame {
@@ -186,7 +187,9 @@ public class Custom_object_window extends JFrame {
 
         public Option_window(MainWindow refWindow) throws HeadlessException {
             super("option menu");
+            Point pt = getPointerInfo().getLocation();
             this.refWindow = refWindow;
+            setLocation(pt);
             action_list = new JList();
             add(action_list);
             setVisible(true);
