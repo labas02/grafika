@@ -186,7 +186,6 @@ public class Custom_object_window extends JFrame {
 
         public Option_window(MainWindow refWindow) throws HeadlessException {
             super("option menu");
-
             this.refWindow = refWindow;
             action_list = new JList();
             add(action_list);
