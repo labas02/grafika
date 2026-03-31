@@ -204,7 +204,8 @@ public class Custom_object_window extends JFrame {
         void init_window(){
 
             setFocusable(true);
-            setSize(200,200);
+            setUndecorated(true);
+            setSize(120,150);
         }
 
         void init_gui(){
