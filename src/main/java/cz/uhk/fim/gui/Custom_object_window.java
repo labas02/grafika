@@ -24,9 +24,9 @@ public class Custom_object_window extends JFrame {
 
     Option_window option_window;
 
-    private List<Object_node> nodes = new ArrayList<>();
-    private List<Object_node> selected_nodes = new ArrayList<>();
-    private List<Object_node> selected_nodes_for_edit = new ArrayList<>();
+    private ArrayList<Object_node> nodes = new ArrayList<>();
+    private ArrayList<Object_node> selected_nodes = new ArrayList<>();
+    private ArrayList<Object_node> selected_nodes_for_edit = new ArrayList<>();
 
     public Custom_object_window() {
     }
@@ -39,7 +39,7 @@ public class Custom_object_window extends JFrame {
         initGui();
         initData();
         initListeners();
-        btVytvor.addActionListener(e-> refWindow.btCreateCustomActionPerformed());
+        btVytvor.addActionListener(e-> refWindow.btCreateCustomActionPerformed(nodes));
     }
 
     void initGui() {
@@ -248,6 +248,7 @@ public class Custom_object_window extends JFrame {
             }
         };
 
+
         private void button_events(int which){
             /*
             * 1 = connect
@@ -256,17 +257,30 @@ public class Custom_object_window extends JFrame {
             * */
             switch (which){
                 case 1:
-                    selected_nodes_for_edit.getFirst().setNext_node(selected_nodes_for_edit.getLast());
-                    selected_nodes_for_edit.getLast().setPrevious_node(selected_nodes_for_edit.getFirst());
+                        selected_nodes_for_edit.getFirst().set_neighboring_node(selected_nodes_for_edit.getLast());
+                        selected_nodes_for_edit.getLast().set_neighboring_node(selected_nodes_for_edit.getFirst());
+
                     selected_nodes_for_edit.getFirst().setIs_selected(false);
                     selected_nodes_for_edit.getLast().setIs_selected(false);
                     selected_nodes_for_edit = new ArrayList<>();
                     canvas.repaint();
                     break;
                 case 2:
+                    selected_nodes_for_edit.getFirst().setNeighboring_node_null(selected_nodes_for_edit.getLast());
+                    selected_nodes_for_edit.getLast().setNeighboring_node_null(selected_nodes_for_edit.getFirst());
+                    selected_nodes_for_edit.getFirst().setIs_selected(false);
+                    selected_nodes_for_edit.getLast().setIs_selected(false);
+                    selected_nodes_for_edit = new ArrayList<>();
+                    canvas.repaint();
                     break;
                 case 3:
                     Object_node o = selected_nodes_for_edit.getFirst();
+                    if (o.getPrevious_node()!= null) {
+                        o.getPrevious_node().setNeighboring_node_null(o);
+                    }
+                    if (o.getNext_node() != null) {
+                        o.getNext_node().setNeighboring_node_null(o);
+                    }
                     selected_nodes.remove(o);
                     selected_nodes_for_edit.remove(o);
                     nodes.remove(o);

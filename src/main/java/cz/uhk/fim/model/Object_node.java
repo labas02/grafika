@@ -7,7 +7,6 @@ public class Object_node extends GraphObject {
 
         protected int width;
         protected int height;
-        protected Point pos;
         protected boolean is_selected;
         protected Color selected_color = Color.ORANGE;
         protected Object_node previous_node = null;
@@ -41,12 +40,12 @@ public class Object_node extends GraphObject {
         return previous_node;
     }
 
-    public void setPrevious_node(Object_node previous_node) {
-        this.previous_node = previous_node;
-    }
-
     public Object_node getNext_node() {
         return next_node;
+    }
+
+    public void setPrevious_node(Object_node previous_node) {
+        this.previous_node = previous_node;
     }
 
     public void setNext_node(Object_node next_node) {
@@ -59,6 +58,23 @@ public class Object_node extends GraphObject {
 
     public void setIs_selected(boolean is_selected) {
         this.is_selected = is_selected;
+    }
+
+    public void setNeighboring_node_null(Object_node o){
+            if (next_node == o){
+                next_node = null;
+            } else if (previous_node == o) {
+                previous_node = null;
+            }
+    }
+    public void set_neighboring_node(Object_node o){
+            if (has_empty_neighbor()){
+                if (next_node==null){
+                    next_node = o;
+                }else {
+                    previous_node = o;
+                }
+            }
     }
 
     public Object_node(int sx, int sy, Color color, boolean filled, int width, int height) {
@@ -80,6 +96,7 @@ public class Object_node extends GraphObject {
             }else {
                 g2.setColor(color);
             }
+
             if (next_node != null){
                 g.drawLine(next_node.coord.x,next_node.coord.y,coord.x,coord.y);
             }
@@ -104,6 +121,13 @@ public class Object_node extends GraphObject {
             int sy = coord.y;
             return sx - width / 2 <= x && x <= sx + width / 2 && sy - height / 2 <= y && y <= sy + height / 2;
         }
+
+
+
+
+    public boolean has_empty_neighbor(){
+        return next_node == null || previous_node==null;
+    }
 
 
 }

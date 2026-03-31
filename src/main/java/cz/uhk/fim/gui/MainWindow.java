@@ -234,14 +234,9 @@ public class MainWindow extends javax.swing.JFrame {
         repaint();
     }
 
-    void btCreateCustomActionPerformed(  ){
-        Color color = ((Barva) cbBarva.getSelectedItem()).color();
-        boolean vypln = xbFilled.isSelected();
-        int x =  Integer.parseInt(tfx.getText());
-        int y =  Integer.parseInt(tfy.getText());
+    void btCreateCustomActionPerformed(ArrayList<Object_node> nodes){
 
-        winCirc.setVisible(false);
-        objects.add(new Circle(x,y, color, vypln, winCirc.getR()));
+        objects.add(new Custom_object(nodes,new Point(0,0), BLACK));
         repaint();
     }
 
