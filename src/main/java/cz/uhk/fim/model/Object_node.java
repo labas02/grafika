@@ -1,5 +1,9 @@
 package cz.uhk.fim.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.awt.*;
 
 public class Object_node extends GraphObject {
@@ -8,8 +12,10 @@ public class Object_node extends GraphObject {
         protected int height;
         protected boolean is_selected;
         protected Color selected_color = Color.ORANGE;
-        protected Object_node previous_node = null;
-        protected Object_node next_node = null;
+        @JsonIgnore
+        private Object_node previous_node = null;
+        @JsonIgnore
+        private Object_node next_node = null;
 
         public int getWidth() {
             return width;

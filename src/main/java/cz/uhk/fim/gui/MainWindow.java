@@ -1,9 +1,6 @@
 package cz.uhk.fim.gui;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.uhk.fim.model.*;
 import cz.uhk.fim.model.Rectangle;
@@ -11,12 +8,9 @@ import cz.uhk.fim.model.Rectangle;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import static java.awt.Color.*;
 
@@ -34,7 +28,7 @@ public class MainWindow extends JFrame {
 
     JPanel listPanel;
 
-    JButton btCircle, btRectangle, btTriangle,btCustom,btExport,btImport;
+    JButton btCircle, btRectangle, btTriangle,btCustom, btSaveState,btLoadState;
     JComboBox<Barva> cbBarva;
     JCheckBox xbFilled;
 
@@ -95,8 +89,10 @@ public class MainWindow extends JFrame {
         controlPanel.add(btTriangle);
         btCustom = new JButton("custom");
         controlPanel.add(btCustom);
-        btExport = new JButton("export objects");
-        controlPanel.add(btExport);
+        btSaveState = new JButton("save state");
+        controlPanel.add(btSaveState);
+        btLoadState = new JButton("load state");
+        controlPanel.add(btLoadState);
         add(controlPanel, BorderLayout.SOUTH);
 
         listPanel = new JPanel();
@@ -105,7 +101,7 @@ public class MainWindow extends JFrame {
         listPanel.add(Box.createVerticalGlue());
 
         JScrollPane scrollPane = new JScrollPane(listPanel);
-        scrollPane.setPreferredSize(new Dimension(200, 0));
+        scrollPane.setPreferredSize(new Dimension(300, 0));
         add(scrollPane,BorderLayout.EAST);
 
         drawPanel = new MujDrawPanel();
@@ -130,6 +126,14 @@ public class MainWindow extends JFrame {
 
         JLabel label = new JLabel(obj.toString());
         JButton editButton = new JButton("Edit");
+        JButton deleteButton = new JButton("delete");
+
+        deleteButton.addActionListener(e->{
+            objects.remove(obj);
+            update_list();
+            revalidate();
+            repaint();
+        });
 
         editButton.addActionListener(e -> {
             System.out.println("Edit clicked: ");
@@ -145,11 +149,14 @@ public class MainWindow extends JFrame {
                 case 4:
                     break;
             }
-
+            update_list();
+            revalidate();
+            repaint();
         });
 
-        row.add(label, BorderLayout.CENTER);
-        row.add(editButton, BorderLayout.EAST);
+        row.add(label, BorderLayout.WEST);
+        row.add(editButton, BorderLayout.CENTER);
+        row.add(deleteButton, BorderLayout.EAST);
 
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // keeps rows compact
 
@@ -163,7 +170,8 @@ public class MainWindow extends JFrame {
         btRectangle.addActionListener(this::btObdelnikActionPerformed);
         btTriangle.addActionListener(this::btTrojuhelnikActionPerformed);
         btCustom.addActionListener(this::btCustomActionPerformed);
-        btExport.addActionListener(evt -> btExportActionPerformed(evt));
+        btSaveState.addActionListener(evt -> btExportActionPerformed(evt));
+        btLoadState.addActionListener(this::btImportActionPerformed);
 
         CustomMouseListener mouseListener  = new CustomMouseListener();
         drawPanel.addMouseListener((MouseListener) mouseListener);
@@ -247,11 +255,101 @@ public class MainWindow extends JFrame {
     }
 
     void btExportActionPerformed(ActionEvent evt)  {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
 
+            mapper.writeValue(new File("data/json"),objects);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    void btImportActionPerformed(String json){
+    void btImportActionPerformed(ActionEvent evt){
+        objects = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonnode = mapper.readTree(new File("data/json"));
+            ArrayList<GraphObject> tmp = new ArrayList<>();
+            jsonnode.forEach(element->{
+                Point coord;
+                JsonNode jsoncolor;
+                Color color;
+                switch (element.get("_type").asInt()){
+                    case 1:
+                        coord = new Point(element.get("coord").get("x").asInt(),element.get("coord").get("y").asInt());
+                        jsoncolor = element.get("color");
+                        color = new Color(jsoncolor.get("red").asInt(),jsoncolor.get("green").asInt(),jsoncolor.get("blue").asInt());
+                        objects.add(new Circle(coord,color,element.get("filled").asBoolean(),element.get("radius").asInt()));
+                        break;
+                    case 2:
+                        coord = new Point(element.get("coord").get("x").asInt(),element.get("coord").get("y").asInt());
+                        jsoncolor = element.get("color");
+                        color = new Color(jsoncolor.get("red").asInt(),jsoncolor.get("green").asInt(),jsoncolor.get("blue").asInt());
+                        objects.add(new Rectangle(coord,color,element.get("filled").asBoolean(),element.get("width").asInt(),element.get("height").asInt()));
+                        System.out.println(2);
+                        break;
+                    case 3:
+                        coord = new Point(element.get("coord").get("x").asInt(),element.get("coord").get("y").asInt());
+                        jsoncolor = element.get("color");
+                        //color = new Color(jsoncolor.get("red").asInt(),jsoncolor.get("green").asInt(),jsoncolor.get("blue").asInt());
+                        ArrayList<Object_node> nodes = new ArrayList<>();
+                        JsonNode jsonNodes = element.get("nodes");
+                        jsonNodes.forEach(node->{
+                            Point ndcoord;
+                            if (nodes.isEmpty()){
+                                ndcoord = new Point(node.get("coord").get("x").asInt(), node.get("coord").get("y").asInt());
+                                Object_node new_node = new Object_node(ndcoord, BLUE, node.get("filled").asBoolean(), 10, 10);
+                                nodes.add(new_node);
+                            }
+                            else {
+                                ndcoord = new Point(node.get("coord").get("x").asInt(), node.get("coord").get("y").asInt());
+                                System.out.println(ndcoord);
+                                Object_node new_node = new Object_node(ndcoord, BLUE, node.get("filled").asBoolean(), 10, 10);
+                                nodes.add(new_node);
+                            }
+                            });
+                        System.out.println(nodes.size());
+                        for (int i = 0; i < nodes.size()-1; i++) {
+                                if (i == 0){
+                                    nodes.get(i).setNext_node(nodes.get(i+1));
+                                    nodes.get(i).setNext_node(nodes.get(nodes.size()-1));
+                                } else if (i == nodes.size()) {
+                                    nodes.get(i).setPrevious_node(nodes.get(i-1));
+                                    nodes.get(i).setNext_node(nodes.get(0));
+                                }else {
+                                    nodes.get(i).setNext_node(nodes.get(i+1));
+                                    nodes.get(i).setPrevious_node(nodes.get(i-1));
+                                }
+                        }
 
+                        System.out.println(nodes.toString());
+                        objects.add(new Custom_object(nodes,coord, BLUE));
+                        System.out.println(3);
+                        break;
+                    case 4:
+                        coord = new Point(element.get("coord").get("x").asInt(),element.get("coord").get("y").asInt());
+                        jsoncolor = element.get("color");
+                        color = new Color(jsoncolor.get("red").asInt(),jsoncolor.get("green").asInt(),jsoncolor.get("blue").asInt());
+                        JsonNode jverts = element.get("vert");
+                        ArrayList<Point> verts = new ArrayList<>();
+                        jverts.forEach(vert->{
+                            verts.add(new Point(vert.get("x").asInt(),vert.get("y").asInt()));
+                        });
+                        objects.add(new Triangle(verts.toArray(new Point[3]), color,element.get("filled").asBoolean()));
+                        System.out.println(4);
+                        break;
+                    default:
+                        break;
+                }
+
+            });
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        update_list();
+        revalidate();
+        repaint();
     }
 
     void btObdelnikActionPerformed(ActionEvent evt) {

@@ -3,6 +3,8 @@ package cz.uhk.fim.gui;
 import javax.swing.*;
 import java.awt.*;
 
+import static java.lang.Integer.parseInt;
+
 public class RectangleEditWindow extends JFrame {
     MainWindow mainWindow;
 
@@ -21,11 +23,11 @@ public class RectangleEditWindow extends JFrame {
     }
 
     int width() {
-        return Integer.parseInt(tfSirka.getText());
+        return parseInt(tfSirka.getText());
     }
 
     int height() {
-        return Integer.parseInt(tfVyska.getText());
+        return parseInt(tfVyska.getText());
     }
 
     void initGui() {
