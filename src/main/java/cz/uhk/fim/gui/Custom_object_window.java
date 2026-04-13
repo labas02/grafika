@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import static java.awt.Color.*;
 import static java.awt.MouseInfo.getPointerInfo;
@@ -17,6 +18,9 @@ import static java.awt.event.MouseEvent.*;
 public class Custom_object_window extends JFrame {
     MainWindow refWindow;
 
+    private boolean is_editiong;
+
+    private GraphObject obj;
 
     JButton btVytvor;
     JPanel controlPanel;
@@ -31,15 +35,42 @@ public class Custom_object_window extends JFrame {
     public Custom_object_window() {
     }
 
-    public Custom_object_window(MainWindow refWindow) {
+
+    public Custom_object_window(MainWindow refWindow,Custom_object obj) {
         super("Pridej kruh");
         this.refWindow = refWindow;
+        this.obj = obj;
+        this.nodes = obj.getNodes();
         //setDefaultCloseOperation(HIDE_ON_CLOSE);
+
         setSize(200, 150);
         initGui();
         initData();
         initListeners();
-        btVytvor.addActionListener(e-> refWindow.btCreateCustomActionPerformed(nodes));
+        btVytvor.addActionListener(e-> {
+            sort_nodes();
+            obj.setNodes(nodes);
+            refWindow.btCreateCustomActionPerformed(nodes);
+            setVisible(false);
+        });
+    }
+
+    void sort_nodes(){
+        ArrayList<Object_node> tmp_nodes = new ArrayList<>();
+        Object_node first_node;
+        Object_node next_node = null;
+        first_node = nodes.getFirst();
+        Object_node current_node = first_node;
+
+        while (first_node!= next_node){
+            tmp_nodes.add(current_node);
+            next_node = tmp_nodes.getLast().getNext_node();
+            if (next_node.getNext_node() == current_node){
+                next_node.flip_neighbors();
+            }
+            current_node = next_node;
+        }
+        nodes = tmp_nodes;
     }
 
     void initGui() {
@@ -177,7 +208,7 @@ public class Custom_object_window extends JFrame {
         public void paint(Graphics g) {
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(Color.white);
+            g2d.setColor(white);
             g2d.fillRect(0, 0, getWidth(), getHeight());
             g2d.setStroke(new BasicStroke(6f));
             //g2d.setXORMode(Color.BLACK);
@@ -258,6 +289,11 @@ public class Custom_object_window extends JFrame {
             * */
             switch (which){
                 case 1:
+                    Object_node first = selected_nodes_for_edit.getFirst();
+                    Object_node second = selected_nodes_for_edit.getLast();
+                    if ((first.getNext_node() != null&& first.getPrevious_node() != null)||(second.getNext_node() != null&& second.getPrevious_node() != null)){
+                        return;
+                    }
                         selected_nodes_for_edit.getFirst().set_neighboring_node(selected_nodes_for_edit.getLast());
                         selected_nodes_for_edit.getLast().set_neighboring_node(selected_nodes_for_edit.getFirst());
 
@@ -275,6 +311,7 @@ public class Custom_object_window extends JFrame {
                     canvas.repaint();
                     break;
                 case 3:
+
                     Object_node o = selected_nodes_for_edit.getFirst();
                     if (o.getPrevious_node()!= null) {
                         o.getPrevious_node().setNeighboring_node_null(o);
@@ -282,6 +319,8 @@ public class Custom_object_window extends JFrame {
                     if (o.getNext_node() != null) {
                         o.getNext_node().setNeighboring_node_null(o);
                     }
+                    o.setPrevious_node(null);
+                    o.setNext_node(null);
                     selected_nodes.remove(o);
                     selected_nodes_for_edit.remove(o);
                     nodes.remove(o);

@@ -1,17 +1,26 @@
 package cz.uhk.fim.gui;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.uhk.fim.model.*;
 import cz.uhk.fim.model.Rectangle;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static java.awt.Color.*;
 
-public class MainWindow extends javax.swing.JFrame {
+public class MainWindow extends JFrame {
     TriangleEditWindow winTri;
     CircleEditWindow winCirc;
     RectangleEditWindow winRect;
@@ -21,14 +30,16 @@ public class MainWindow extends javax.swing.JFrame {
     JPanel controlPanel, objectPanel;
     JTextField tfx, tfy;
     JLabel labx, laby;
-    JList list;
-    JScrollPane scList;
-    JButton btCircle, btRectangle, btTriangle,btCustom;
+
+
+    JPanel listPanel;
+
+    JButton btCircle, btRectangle, btTriangle,btCustom,btExport,btImport;
     JComboBox<Barva> cbBarva;
     JCheckBox xbFilled;
 
-    private List<GraphObject> objects = new ArrayList<>();
-    private List<GraphObject> selectedObjects = new ArrayList<>();
+    private ArrayList<GraphObject> objects = new ArrayList<>();
+    private ArrayList<GraphObject> selectedObjects = new ArrayList<>();
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -41,8 +52,8 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow() {
         super("Grafika");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        initGui();
         initData();
+        initGui();
         initWindows();
         initListeners();
     }
@@ -84,24 +95,65 @@ public class MainWindow extends javax.swing.JFrame {
         controlPanel.add(btTriangle);
         btCustom = new JButton("custom");
         controlPanel.add(btCustom);
+        btExport = new JButton("export objects");
+        controlPanel.add(btExport);
         add(controlPanel, BorderLayout.SOUTH);
 
-        objectPanel = new JPanel();
-        objectPanel.setLayout(new FlowLayout());
-        list = new JList();
-        list.setModel(new DefaultListModel());
-        list.setListData(selectedObjects.toArray());
+        listPanel = new JPanel();
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
 
-        scList = new JScrollPane(list);
-        scList.setSize(60, 600);
-        objectPanel.add(scList);
-        add(objectPanel, BorderLayout.EAST);
+        listPanel.add(Box.createVerticalGlue());
+
+        JScrollPane scrollPane = new JScrollPane(listPanel);
+        scrollPane.setPreferredSize(new Dimension(200, 0));
+        add(scrollPane,BorderLayout.EAST);
 
         drawPanel = new MujDrawPanel();
         add(drawPanel, BorderLayout.CENTER);
 
         setSize(800, 600);
         setLocationRelativeTo(null);
+        update_list();
+    }
+
+    private void update_list(){
+        listPanel.removeAll();
+        for (GraphObject obj : objects) {
+            listPanel.add(create_row(obj));
+        }
+        revalidate();
+        repaint();
+    }
+
+    private JPanel create_row(GraphObject obj) {
+        JPanel row = new JPanel(new BorderLayout());
+
+        JLabel label = new JLabel(obj.toString());
+        JButton editButton = new JButton("Edit");
+
+        editButton.addActionListener(e -> {
+            System.out.println("Edit clicked: ");
+            switch (obj.get_type()){
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    winCustom = new Custom_object_window(this,(Custom_object) obj);
+                    winCustom.setVisible(true);
+                    break;
+                case 4:
+                    break;
+            }
+
+        });
+
+        row.add(label, BorderLayout.CENTER);
+        row.add(editButton, BorderLayout.EAST);
+
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // keeps rows compact
+
+        return row;
     }
 
 
@@ -111,6 +163,7 @@ public class MainWindow extends javax.swing.JFrame {
         btRectangle.addActionListener(this::btObdelnikActionPerformed);
         btTriangle.addActionListener(this::btTrojuhelnikActionPerformed);
         btCustom.addActionListener(this::btCustomActionPerformed);
+        btExport.addActionListener(evt -> btExportActionPerformed(evt));
 
         CustomMouseListener mouseListener  = new CustomMouseListener();
         drawPanel.addMouseListener((MouseListener) mouseListener);
@@ -124,11 +177,13 @@ public class MainWindow extends javax.swing.JFrame {
         {
             tfx.setText(String.valueOf(e.getX()));
             tfy.setText(String.valueOf(e.getY()));
+            update_list();
         }
 
         public void mouseDragged(MouseEvent e){
             int px = e.getX();
             int py = e.getY();
+            System.out.println(objects.toString());
 
             int w = drawPanel.getWidth();
             int h = drawPanel.getHeight();
@@ -146,9 +201,9 @@ public class MainWindow extends javax.swing.JFrame {
                 if(o.over(px, py))
                     selectedObjects.add(o);
             }
-            list.setListData(selectedObjects.toArray());
+
             int index = selectedObjects.size() - 1;
-            list.setSelectedIndex(index);
+
             object = selectedObjects.get(index);
         }
 
@@ -157,7 +212,6 @@ public class MainWindow extends javax.swing.JFrame {
             int py = e.getY();
 
             selectedObjects.clear();
-            list.setListData(selectedObjects.toArray());
             object = null;
             repaint();
         }
@@ -185,8 +239,19 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     void btCustomActionPerformed(ActionEvent evt) {
-        winCustom = new Custom_object_window(this);
+        objects.add(new Custom_object(new ArrayList<>(),new Point(0,0),((Barva) cbBarva.getSelectedItem()).color()));
+        winCustom = new Custom_object_window(this, (Custom_object) objects.getLast());
         winCustom.setVisible(true);
+        update_list();
+        repaint();
+    }
+
+    void btExportActionPerformed(ActionEvent evt)  {
+
+    }
+
+    void btImportActionPerformed(String json){
+
     }
 
     void btObdelnikActionPerformed(ActionEvent evt) {
@@ -202,7 +267,7 @@ public class MainWindow extends javax.swing.JFrame {
         int vyska = winRect.height();
 
         winRect.setVisible(false);
-        objects.add(new Rectangle(x,y,color,vypln,sirka,vyska));
+        objects.add(new Rectangle(new Point(x,y),color,vypln,sirka,vyska));
         repaint();
     }
 
@@ -235,8 +300,9 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     void btCreateCustomActionPerformed(ArrayList<Object_node> nodes){
-
-        objects.add(new Custom_object(nodes,new Point(0,0), BLACK));
+        remove(winCustom);
+        winCustom = null;
+        revalidate();
         repaint();
     }
 
@@ -265,7 +331,7 @@ public class MainWindow extends javax.swing.JFrame {
         public void paint(Graphics g) {
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(Color.white);
+            g2d.setColor(white);
             g2d.fillRect(0, 0, getWidth(), getHeight());
             g2d.setStroke(new BasicStroke(6f));
             //g2d.setXORMode(Color.BLACK);
@@ -275,4 +341,6 @@ public class MainWindow extends javax.swing.JFrame {
             objects.forEach(o -> o.draw(g2d));
         }
     }
+
+
 }

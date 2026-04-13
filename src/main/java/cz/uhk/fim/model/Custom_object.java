@@ -1,99 +1,111 @@
 package cz.uhk.fim.model;
 
 import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Vector;
 
+import static java.util.Arrays.copyOfRange;
 import static java.util.Arrays.stream;
 
 public class Custom_object extends GraphObject {
     protected ArrayList<Object_node> nodes;
     Color color;
-
+    int[] vx;
+    int[] vy;
 
     public Custom_object(ArrayList<Object_node> nodes, Point pos, Color color) {
         this.nodes = nodes;
-        this.coord = find_center();
         this.color = color;
+        filled = true;
+        object_type = 3;
+        find_center();
     }
 
-    public Custom_object(Point coord, Color color, boolean filled, ArrayList<Object_node> nodes, Point pos, Color color1) {
-        super(coord, color, filled);
-        this.nodes = nodes;
-        this.coord = find_center();
-        this.color = color1;
-    }
 
     @Override
     public boolean over(int x, int y) {
-        return false;
+         vx = new int[nodes.size()];
+         vy = new int[nodes.size()];
+        for (int i = 0; i < nodes.size(); i++) {
+            Point coords = nodes.get(i).getCoord();
+            vx[i] = coords.x;
+            vy[i] = coords.y;
+        }
+
+        Polygon tmp_poly = new Polygon(vx,vy,nodes.size());
+        return tmp_poly.contains(x,y);
     }
 
     @Override
     public void draw(Graphics g) {
-        System.out.println(coord);
-            Point pr_node_coord = null;
-            Point curr_node_coord = null;
-            Point nx_node_coord = null;
-            g.setColor(Color.BLACK);
-            int j = 0;
-            for (int i = 0; i < nodes.size(); i++) {
-                Object_node curr_node = nodes.get(i);
-                Object_node pr_node = curr_node.getPrevious_node();
-                Object_node nx_node = curr_node.getNext_node();
-                curr_node_coord = curr_node.coord;
-                if (pr_node !=null){
-                    g.drawLine(pr_node.coord.x,pr_node.coord.y,curr_node.coord.x,curr_node.coord.y);
-                    pr_node_coord = pr_node.coord;
+        find_center();
+        vx = new int[nodes.size()];
+        vy = new int[nodes.size()];
 
-                }
-                if (nx_node != null ){
-                    g.drawLine(curr_node.coord.x,curr_node.coord.y,nx_node.coord.x,nx_node.coord.y);
-                    nx_node_coord = nx_node.coord;
+        for (int i = 0; i < nodes.size(); i++) {
+                Point coords = nodes.get(i).getCoord();
+                vx[i] = coords.x;
+                vy[i] = coords.y;
+        }
 
-                }
-
-                if (pr_node!=null && nx_node!= null){
-                    if (Math.abs(curr_node_coord.x-coord.x)>Math.abs(nx_node_coord.x-coord.x)&&
-                            Math.abs(curr_node_coord.y-coord.y)>Math.abs(nx_node_coord.y-coord.y)){
-
-                        int[] vx = new int[]{pr_node_coord.x, curr_node_coord.x, nx_node_coord.x};
-                        int[] vy = new int[]{pr_node_coord.y, curr_node_coord.y, nx_node_coord.y};
-                        System.out.println("\ncurr node: "+curr_node_coord);
-                        System.out.println("\npr node: "+pr_node_coord);
-                        System.out.println("\nnx node: "+nx_node_coord);
-                        g.fillPolygon(vx,vy,3);
-                    }
-
-
-
-                }
-
-
-                }
-
-
-            /*
             if (filled) {
-                g.fillPolygon(vx,vy, nodes.size()*3);
+                g.fillPolygon(vx,vy, nodes.size());
             } else{
-            g.drawPolygon(vx,vy, nodes.size()*3);
+            g.drawPolygon(vx,vy, nodes.size());
             }
 
-             */
         }
 
 
 
-    public Point find_center(){
-            Point pos = new Point();
+    public void find_center(){
+        if (nodes.isEmpty()){return;}
             int x = 0;
             int y = 0;
             for (int i = 0; i < nodes.size(); i++) {
-                 x += nodes.get(i).coord.x;
-                 y += nodes.get(i).coord.y;
+                 x += nodes.get(i).getCoord().x;
+                 y += nodes.get(i).getCoord().y;
             }
-            return new Point(x/nodes.size(),y/nodes.size());
+            Point new_point = new Point(x/nodes.size(),y/nodes.size());
+            Point tmp;
+        if (getCoord() != null) {
+
+            tmp = new Point(getCoord().x - new_point.x, getCoord().y - new_point.y);
+            for (Object_node node : nodes) {
+                node.getCoord().x += tmp.x;
+                node.getCoord().y += tmp.y;
+            }
         }
+        setCoord(new_point);
+
+        };
+
+    public ArrayList<Object_node> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(ArrayList<Object_node> nodes) {
+        this.nodes = nodes;
+        find_center();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Custom_object {\n");
+        sb.append("  center = ").append(getCoord()).append("\n");
+        sb.append("  color = ").append(color).append("\n");
+        sb.append("  filled = ").append(filled).append("\n");
+        sb.append("  nodes count = ").append(nodes.size()).append("\n");
+
+        sb.append("  nodes:\n");
+        for (int i = 0; i < nodes.size(); i++) {
+            sb.append("    [").append(i).append("] ");
+            sb.append(nodes.get(i).toString()).append("\n");
+        }
+
+        sb.append("}");
+
+        return sb.toString();
+    }
     }

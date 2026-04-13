@@ -18,7 +18,7 @@ public class Triangle extends GraphObject{
     }
 
     public Triangle(Point[] vert, Color barva, boolean vypln) {
-        super(getCenter(vert),barva,vypln);
+        super(getCenter(vert),barva,vypln,4);
         this.vert = vert;
     }
 
@@ -35,7 +35,7 @@ public class Triangle extends GraphObject{
     }
 
     public Point getCoord() {
-        return coord;
+        return super.getCoord();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Triangle extends GraphObject{
 
     @Override
     public String toString() {
-        return "triangle (" + coord + ") " + color + " " + filled;
+        return "triangle (" + super.getCoord() + ") " + color + " " + filled;
 
     }
 

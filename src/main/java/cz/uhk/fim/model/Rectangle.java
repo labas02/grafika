@@ -30,12 +30,9 @@ public class Rectangle extends GraphObject {
         this.filled = filled;
     }
 
-    public Rectangle(int sx, int sy, Color color, boolean filled, int width, int height) {
-        this(new Point(sx,sy), color, filled, width, height);
-    }
 
     public Rectangle(Point coord, Color barva, boolean filled, int width, int height) {
-        super(coord, barva, filled);
+        super(coord, barva, filled,2);
         this.width = width;
         this.height = height;
     }
@@ -46,21 +43,21 @@ public class Rectangle extends GraphObject {
 //        g2.rotate(0.12);
         g2.setColor(color);
         if (filled)
-            g2.fillRect(coord.x- width /2, coord.y- height /2, width, height);
+            g2.fillRect(getCoord().x- width /2, getCoord().y- height /2, width, height);
         else
-            g2.drawRect(coord.x- width /2, coord.y- height /2, width, height);
+            g2.drawRect(getCoord().x- width /2, getCoord().y- height /2, width, height);
 //        g2.rotate(-0.12);
     }
 
     @Override
     public String toString() {
-        return "rectangle (" + coord + ") " + color + " " + filled;
+        return "rectangle (" + getCoord() + ") " + color + " " + filled;
     }
 
     @Override
     public boolean over(int x, int y) {
-        int sx = coord.x;
-        int sy = coord.y;
+        int sx = getCoord().x;
+        int sy = getCoord().y;
         return sx-width/2 <= x && x <= sx+width/2 && sy-height/2 <= y && y <= sy+height/2;
     }
 }

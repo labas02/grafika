@@ -1,7 +1,6 @@
 package cz.uhk.fim.model;
 
 import java.awt.*;
-import java.util.Vector;
 
 public class Object_node extends GraphObject {
 
@@ -82,7 +81,7 @@ public class Object_node extends GraphObject {
         }
 
         public Object_node(Point coord, Color barva, boolean filled, int width, int height) {
-            super(coord, barva, filled);
+            super(coord, barva, filled,2);
             this.width = width;
             this.height = height;
         }
@@ -98,32 +97,63 @@ public class Object_node extends GraphObject {
             }
 
             if (next_node != null){
-                g.drawLine(next_node.coord.x,next_node.coord.y,coord.x,coord.y);
+                g.drawLine(next_node.getCoord().x, next_node.getCoord().y, getCoord().x, getCoord().y);
             }
             if (previous_node != null){
-                g.drawLine(previous_node.coord.x,previous_node.coord.y,coord.x,coord.y);
+                g.drawLine(previous_node.getCoord().x, previous_node.getCoord().y, getCoord().x, getCoord().y);
             }
             if (filled)
-                g2.fillRect(coord.x- width /2, coord.y- height /2, width, height);
+                g2.fillRect(getCoord().x- width /2, getCoord().y- height /2, width, height);
             else
-                g2.drawRect(coord.x- width /2, coord.y- height /2, width, height);
+                g2.drawRect(getCoord().x- width /2, getCoord().y- height /2, width, height);
 //        g2.rotate(-0.12);
         }
 
-        @Override
-        public String toString() {
-            return "rectangle (" + coord + ") " + color + " " + filled;
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Object_node { ");
+        sb.append("coord=").append(getCoord());
+        sb.append(", width=").append(width);
+        sb.append(", height=").append(height);
+        sb.append(", color=").append(color);
+        sb.append(", filled=").append(filled);
+        sb.append(", selected=").append(is_selected);
+
+        // Avoid infinite recursion by only printing neighbor coordinates
+        sb.append(", previous_node=");
+        if (previous_node != null) {
+            sb.append(previous_node.getCoord());
+        } else {
+            sb.append("null");
         }
+
+        sb.append(", next_node=");
+        if (next_node != null) {
+            sb.append(next_node.getCoord());
+        } else {
+            sb.append("null");
+        }
+
+        sb.append(" }");
+
+        return sb.toString();
+    }
 
         @Override
         public boolean over(int x, int y) {
-            int sx = coord.x;
-            int sy = coord.y;
+            int sx = getCoord().x;
+            int sy = getCoord().y;
             return sx - width / 2 <= x && x <= sx + width / 2 && sy - height / 2 <= y && y <= sy + height / 2;
         }
 
 
-
+        public void flip_neighbors(){
+            Object_node tmp = next_node;
+            next_node = previous_node;
+            previous_node = tmp;
+        }
 
     public boolean has_empty_neighbor(){
         return next_node == null || previous_node==null;
