@@ -27,7 +27,7 @@ public class MainWindow extends JFrame {
 
     JPanel listPanel;
 
-    JButton btCircle, btRectangle, btTriangle,btCustom, btSaveState,btLoadState;
+    JButton btCircle, btTriangle,btCustom, btSaveState,btLoadState;
     JComboBox<Barva> cbBarva;
     JCheckBox xbFilled;
 
@@ -76,8 +76,6 @@ public class MainWindow extends JFrame {
 
         btCircle = new JButton("Circle");
         controlPanel.add(btCircle);
-        btRectangle = new JButton("Rectangle");
-        controlPanel.add(btRectangle);
         btTriangle = new JButton("Triangle");
         controlPanel.add(btTriangle);
         btCustom = new JButton("custom");
@@ -94,7 +92,7 @@ public class MainWindow extends JFrame {
         listPanel.add(Box.createVerticalGlue());
 
         JScrollPane scrollPane = new JScrollPane(listPanel);
-        scrollPane.setPreferredSize(new Dimension(300, 0));
+        scrollPane.setMaximumSize(new Dimension(300, 0));
         add(scrollPane,BorderLayout.EAST);
 
         drawPanel = new MujDrawPanel();
@@ -117,8 +115,10 @@ public class MainWindow extends JFrame {
     private JPanel create_row(GraphObject obj) {
         JPanel row = new JPanel(new BorderLayout());
 
-        JLabel label = new JLabel(obj.toString());
+        JLabel label = new JLabel(obj.get_type_string());
+        label.setPreferredSize(new Dimension(100, 20));
         JButton editButton = new JButton("Edit");
+        editButton.setPreferredSize(new Dimension(100, 20));
         JButton deleteButton = new JButton("delete");
 
         deleteButton.addActionListener(e->{
@@ -162,7 +162,6 @@ public class MainWindow extends JFrame {
     private void initListeners()
     {
         btCircle.addActionListener(this::btKruhActionPerformed);
-        btRectangle.addActionListener(this::btObdelnikActionPerformed);
         btCustom.addActionListener(this::btCustomActionPerformed);
         btSaveState.addActionListener(evt -> btExportActionPerformed(evt));
         btLoadState.addActionListener(this::btImportActionPerformed);
@@ -307,15 +306,14 @@ public class MainWindow extends JFrame {
                         for (int i = 0; i < nodes.size()-1; i++) {
                                 if (i == 0){
                                     nodes.get(i).setNext_node(nodes.get(i+1));
-                                    nodes.get(i).setNext_node(nodes.get(nodes.size()-1));
-                                } else if (i == nodes.size()) {
-                                    nodes.get(i).setPrevious_node(nodes.get(i-1));
-                                    nodes.get(i).setNext_node(nodes.get(0));
-                                }else {
+                                    nodes.get(i).setNext_node(nodes.getLast());
+                                } else {
                                     nodes.get(i).setNext_node(nodes.get(i+1));
                                     nodes.get(i).setPrevious_node(nodes.get(i-1));
                                 }
                         }
+                        nodes.getFirst().setPrevious_node(nodes.getLast());
+                        nodes.getLast().setNext_node(nodes.getFirst());
 
                         System.out.println(nodes.toString());
                         objects.add(new Custom_object(nodes,coord, BLUE));

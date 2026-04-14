@@ -59,4 +59,16 @@ public abstract class GraphObject {
     public void move(int x, int y) {
         getCoord().setLocation(x,y);
     }
+
+    public String get_type_string() {
+        switch (object_type){
+            case 1:
+                return "kruh";
+            case 2:
+                return "ctverec";
+            case 4:
+                return "custom";
+        }
+        return null;
+    }
 }
