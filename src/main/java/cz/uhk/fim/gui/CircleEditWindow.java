@@ -1,5 +1,7 @@
 package cz.uhk.fim.gui;
 
+import cz.uhk.fim.model.Circle;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -10,9 +12,10 @@ public class CircleEditWindow extends JFrame {
     JTextField tfR;
     JButton btVytvor;
     JPanel pControl, pInput;
+    Circle obj;
 
     public CircleEditWindow() {}
-    public CircleEditWindow(MainWindow refWindow) {
+    public CircleEditWindow(MainWindow refWindow,Circle obj) {
         super("Pridej kruh");
         this.refWindow = refWindow;
         setDefaultCloseOperation(HIDE_ON_CLOSE);

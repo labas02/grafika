@@ -15,7 +15,6 @@ import java.io.IOException;
 import static java.awt.Color.*;
 
 public class MainWindow extends JFrame {
-    TriangleEditWindow winTri;
     CircleEditWindow winCirc;
     RectangleEditWindow winRect;
     Custom_object_window winCustom;
@@ -53,12 +52,6 @@ public class MainWindow extends JFrame {
     }
 
     private void initWindows() {
-        winTri = new TriangleEditWindow(this);
-        winCirc = new CircleEditWindow(this);
-        winRect = new RectangleEditWindow(this);
-        winTri.setVisible(false);
-        winCirc.setVisible(false);
-        winRect.setVisible(false);
     }
 
     private void initGui()
@@ -139,6 +132,8 @@ public class MainWindow extends JFrame {
             System.out.println("Edit clicked: ");
             switch (obj.get_type()){
                 case 1:
+                    winCirc = new CircleEditWindow(this, (Circle) obj);
+                    winCirc.setVisible(true);
                     break;
                 case 2:
                     break;
@@ -168,7 +163,6 @@ public class MainWindow extends JFrame {
     {
         btCircle.addActionListener(this::btKruhActionPerformed);
         btRectangle.addActionListener(this::btObdelnikActionPerformed);
-        btTriangle.addActionListener(this::btTrojuhelnikActionPerformed);
         btCustom.addActionListener(this::btCustomActionPerformed);
         btSaveState.addActionListener(evt -> btExportActionPerformed(evt));
         btLoadState.addActionListener(this::btImportActionPerformed);
@@ -238,12 +232,13 @@ public class MainWindow extends JFrame {
 
     }
 
-    void btTrojuhelnikActionPerformed(ActionEvent evt) {
-        winTri.setVisible(true);
-    }
 
     void btKruhActionPerformed(ActionEvent evt) {
+        objects.add(new Circle(new Point(Integer.parseInt(tfx.getText()),Integer.parseInt(tfy.getText())),((Barva) cbBarva.getSelectedItem()).color(),Boolean.valueOf(xbFilled.getText()),0));
+        winCirc = new CircleEditWindow(this,(Circle) objects.getLast());
         winCirc.setVisible(true);
+        update_list();
+        repaint();
     }
 
     void btCustomActionPerformed(ActionEvent evt) {
@@ -326,18 +321,7 @@ public class MainWindow extends JFrame {
                         objects.add(new Custom_object(nodes,coord, BLUE));
                         System.out.println(3);
                         break;
-                    case 4:
-                        coord = new Point(element.get("coord").get("x").asInt(),element.get("coord").get("y").asInt());
-                        jsoncolor = element.get("color");
-                        color = new Color(jsoncolor.get("red").asInt(),jsoncolor.get("green").asInt(),jsoncolor.get("blue").asInt());
-                        JsonNode jverts = element.get("vert");
-                        ArrayList<Point> verts = new ArrayList<>();
-                        jverts.forEach(vert->{
-                            verts.add(new Point(vert.get("x").asInt(),vert.get("y").asInt()));
-                        });
-                        objects.add(new Triangle(verts.toArray(new Point[3]), color,element.get("filled").asBoolean()));
-                        System.out.println(4);
-                        break;
+
                     default:
                         break;
                 }
@@ -369,22 +353,6 @@ public class MainWindow extends JFrame {
         repaint();
     }
 
-    void btCreateTriangleActionPerformed(ActionEvent e) {
-        Color color = ((Barva) cbBarva.getSelectedItem()).color();
-        boolean vypln = xbFilled.isSelected();
-
-        Point [] vrcholy = new Point[3];
-        int x [] = winTri.xcoord();
-        int y [] = winTri.ycoord();
-
-        for (int i = 0; i < 3; i++) {
-            vrcholy[i] = new Point(x[i], y[i]);
-        }
-
-        winTri.setVisible(false);
-        objects.add(new Triangle(vrcholy, color, vypln));
-        repaint();
-    }
 
     void btCreateCircleActionPerformed(ActionEvent e) {
         Color color = ((Barva) cbBarva.getSelectedItem()).color();
@@ -417,7 +385,6 @@ public class MainWindow extends JFrame {
         vrcholy[0] = v0;
         vrcholy[1] = v1;
         vrcholy[2] = v2;
-        objects.add(new Triangle(vrcholy, green,false));
     }
 
     class MujDrawPanel extends JPanel {
