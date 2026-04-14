@@ -37,7 +37,7 @@ public class Custom_object_window extends JFrame {
 
 
     public Custom_object_window(MainWindow refWindow,Custom_object obj) {
-        super("Pridej kruh");
+        super("Pridej custom");
         this.refWindow = refWindow;
         this.obj = obj;
         this.nodes = obj.getNodes();

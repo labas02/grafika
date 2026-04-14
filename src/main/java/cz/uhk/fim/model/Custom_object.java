@@ -14,6 +14,8 @@ public class Custom_object extends GraphObject {
     public Custom_object(ArrayList<Object_node> nodes, Point pos, Color color,boolean filled) {
         super(pos,color, filled,3);
         this.nodes = nodes;
+        this.filled = filled;
+        System.out.println(filled);
         find_center();
     }
 
@@ -34,7 +36,8 @@ public class Custom_object extends GraphObject {
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(color);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setColor(color);
         find_center();
         vx = new int[nodes.size()];
         vy = new int[nodes.size()];
@@ -46,9 +49,9 @@ public class Custom_object extends GraphObject {
         }
 
             if (filled) {
-                g.fillPolygon(vx,vy, nodes.size());
+                g2.fillPolygon(vx,vy, nodes.size());
             } else{
-            g.drawPolygon(vx,vy, nodes.size());
+            g2.drawPolygon(vx,vy, nodes.size());
             }
 
         }

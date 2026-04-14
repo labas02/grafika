@@ -244,7 +244,7 @@ public class MainWindow extends JFrame {
     }
 
     void btCustomActionPerformed(ActionEvent evt) {
-        objects.add(new Custom_object(new ArrayList<>(),new Point(0,0),((Barva) cbBarva.getSelectedItem()).color(),Boolean.valueOf(xbFilled.getText())));
+        objects.add(new Custom_object(new ArrayList<>(),new Point(0,0),((Barva) cbBarva.getSelectedItem()).color(),Boolean.parseBoolean(String.valueOf(xbFilled))));
         winCustom = new Custom_object_window(this, (Custom_object) objects.getLast());
         winCustom.setVisible(true);
         update_list();
