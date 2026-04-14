@@ -303,17 +303,21 @@ public class MainWindow extends JFrame {
                             }
                             });
                         System.out.println(nodes.size());
-                        for (int i = 0; i < nodes.size()-1; i++) {
-                                if (i == 0){
-                                    nodes.get(i).setNext_node(nodes.get(i+1));
-                                    nodes.get(i).setNext_node(nodes.getLast());
-                                } else {
-                                    nodes.get(i).setNext_node(nodes.get(i+1));
-                                    nodes.get(i).setPrevious_node(nodes.get(i-1));
-                                }
+                        for (int i = 0; i < nodes.size(); i++) {
+                            if (i == 0) {
+                                nodes.get(i).setNext_node(nodes.get(i + 1));
+                                nodes.get(i).setPrevious_node(nodes.get(nodes.size() - 1));
+                            }
+                            else if (i == nodes.size() - 1) {
+                                nodes.get(i).setNext_node(nodes.get(0));
+                                nodes.get(i).setPrevious_node(nodes.get(i - 1));
+                            }
+                            else {
+                                nodes.get(i).setNext_node(nodes.get(i + 1));
+                                nodes.get(i).setPrevious_node(nodes.get(i - 1));
+                            }
                         }
-                        nodes.getFirst().setPrevious_node(nodes.getLast());
-                        nodes.getLast().setNext_node(nodes.getFirst());
+
 
                         System.out.println(nodes.toString());
                         objects.add(new Custom_object(nodes,coord, BLUE));
