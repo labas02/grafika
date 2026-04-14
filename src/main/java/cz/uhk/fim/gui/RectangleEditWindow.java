@@ -1,5 +1,8 @@
 package cz.uhk.fim.gui;
 
+import cz.uhk.fim.model.GraphObject;
+import cz.uhk.fim.model.Rectangle;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,14 +15,19 @@ public class RectangleEditWindow extends JFrame {
     JTextField tfSirka, tfVyska;
     JButton btVytvor;
     JPanel pControl, pInput;
+    Rectangle obj;
 
-    public RectangleEditWindow(MainWindow mainWindow) {
+    public RectangleEditWindow(MainWindow mainWindow, Rectangle obj) {
         super("Pridej obdelnik");
         this.mainWindow = mainWindow;
+        this.obj = obj;
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setSize(200, 150);
         initGui();
-        btVytvor.addActionListener(this.mainWindow::btCreateRectangleActionPerformed);
+        btVytvor.addActionListener(e->{
+                obj.setHeight(height());
+                obj.setWidth(width());
+                mainWindow.btCreateRectangleActionPerformed();});
     }
 
     int width() {

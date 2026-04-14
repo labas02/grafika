@@ -27,7 +27,7 @@ public class MainWindow extends JFrame {
 
     JPanel listPanel;
 
-    JButton btCircle, btTriangle,btCustom, btSaveState,btLoadState;
+    JButton btCircle,btObdelnik,btCustom, btSaveState,btLoadState;
     JComboBox<Barva> cbBarva;
     JCheckBox xbFilled;
 
@@ -76,8 +76,8 @@ public class MainWindow extends JFrame {
 
         btCircle = new JButton("Circle");
         controlPanel.add(btCircle);
-        btTriangle = new JButton("Triangle");
-        controlPanel.add(btTriangle);
+        btObdelnik = new JButton("obdelnik");
+        controlPanel.add(btObdelnik);
         btCustom = new JButton("custom");
         controlPanel.add(btCustom);
         btSaveState = new JButton("save state");
@@ -136,6 +136,8 @@ public class MainWindow extends JFrame {
                     winCirc.setVisible(true);
                     break;
                 case 2:
+                    winRect = new RectangleEditWindow(this, (Rectangle) obj);
+                    winRect.setVisible(true);
                     break;
                 case 3:
                     winCustom = new Custom_object_window(this,(Custom_object) obj);
@@ -163,6 +165,7 @@ public class MainWindow extends JFrame {
     {
         btCircle.addActionListener(this::btKruhActionPerformed);
         btCustom.addActionListener(this::btCustomActionPerformed);
+        btObdelnik.addActionListener(this::btObdelnikActionPerformed);
         btSaveState.addActionListener(evt -> btExportActionPerformed(evt));
         btLoadState.addActionListener(this::btImportActionPerformed);
 
@@ -339,31 +342,23 @@ public class MainWindow extends JFrame {
     }
 
     void btObdelnikActionPerformed(ActionEvent evt) {
-        winRect.setVisible(true);
-    }
-
-    public void btCreateRectangleActionPerformed(ActionEvent actionEvent) {
-        Color color = ((Barva) cbBarva.getSelectedItem()).color();
         boolean vypln = xbFilled.isSelected();
         int x =  Integer.parseInt(tfx.getText());
         int y =  Integer.parseInt(tfy.getText());
-        int sirka = winRect.width();
-        int vyska = winRect.height();
+        Color color = ((Barva) cbBarva.getSelectedItem()).color();
+        objects.add(new Rectangle(new Point(x,y),color,vypln,0,0));
+        winRect = new RectangleEditWindow(this, (Rectangle) objects.getLast());
+        winRect.setVisible(true);
+    }
 
+    public void btCreateRectangleActionPerformed() {
         winRect.setVisible(false);
-        objects.add(new Rectangle(new Point(x,y),color,vypln,sirka,vyska));
         repaint();
     }
 
 
     void btCreateCircleActionPerformed(ActionEvent e) {
-        Color color = ((Barva) cbBarva.getSelectedItem()).color();
-        boolean vypln = xbFilled.isSelected();
-        int x =  Integer.parseInt(tfx.getText());
-        int y =  Integer.parseInt(tfy.getText());
-
         winCirc.setVisible(false);
-        objects.add(new Circle(x,y, color, vypln, winCirc.getR()));
         repaint();
     }
 
