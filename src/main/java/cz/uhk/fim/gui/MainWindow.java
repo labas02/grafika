@@ -244,7 +244,7 @@ public class MainWindow extends JFrame {
     }
 
     void btCustomActionPerformed(ActionEvent evt) {
-        objects.add(new Custom_object(new ArrayList<>(),new Point(0,0),((Barva) cbBarva.getSelectedItem()).color()));
+        objects.add(new Custom_object(new ArrayList<>(),new Point(0,0),((Barva) cbBarva.getSelectedItem()).color(),Boolean.valueOf(xbFilled.getText())));
         winCustom = new Custom_object_window(this, (Custom_object) objects.getLast());
         winCustom.setVisible(true);
         update_list();
@@ -288,7 +288,7 @@ public class MainWindow extends JFrame {
                     case 3:
                         coord = new Point(element.get("coord").get("x").asInt(),element.get("coord").get("y").asInt());
                         jsoncolor = element.get("color");
-                        //color = new Color(jsoncolor.get("red").asInt(),jsoncolor.get("green").asInt(),jsoncolor.get("blue").asInt());
+                        color = new Color(jsoncolor.get("red").asInt(),jsoncolor.get("green").asInt(),jsoncolor.get("blue").asInt());
                         ArrayList<Object_node> nodes = new ArrayList<>();
                         JsonNode jsonNodes = element.get("nodes");
                         jsonNodes.forEach(node->{
@@ -323,7 +323,7 @@ public class MainWindow extends JFrame {
 
 
                         System.out.println(nodes.toString());
-                        objects.add(new Custom_object(nodes,coord, BLUE));
+                        objects.add(new Custom_object(nodes,coord, color,element.get("filled").asBoolean()));
                         System.out.println(3);
                         break;
 

@@ -8,16 +8,12 @@ import static java.util.Arrays.stream;
 
 public class Custom_object extends GraphObject {
     protected ArrayList<Object_node> nodes;
-    Color color;
     int[] vx;
     int[] vy;
 
-    public Custom_object(ArrayList<Object_node> nodes, Point pos, Color color) {
+    public Custom_object(ArrayList<Object_node> nodes, Point pos, Color color,boolean filled) {
+        super(pos,color, filled,3);
         this.nodes = nodes;
-        this.color = color;
-        this.setCoord(pos);
-        filled = true;
-        object_type = 3;
         find_center();
     }
 
@@ -38,6 +34,7 @@ public class Custom_object extends GraphObject {
 
     @Override
     public void draw(Graphics g) {
+        g.setColor(color);
         find_center();
         vx = new int[nodes.size()];
         vy = new int[nodes.size()];
