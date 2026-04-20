@@ -236,7 +236,7 @@ public class MainWindow extends JFrame {
 
 
     void btKruhActionPerformed(ActionEvent evt) {
-        objects.add(new Circle(new Point(Integer.parseInt(tfx.getText()),Integer.parseInt(tfy.getText())),((Barva) cbBarva.getSelectedItem()).color(),Boolean.valueOf(xbFilled.getText()),0));
+        objects.add(new Circle(new Point(Integer.parseInt(tfx.getText()),Integer.parseInt(tfy.getText())),((Barva) cbBarva.getSelectedItem()).color(),xbFilled.isSelected(),0));
         winCirc = new CircleEditWindow(this,(Circle) objects.getLast());
         winCirc.setVisible(true);
         update_list();
@@ -244,7 +244,8 @@ public class MainWindow extends JFrame {
     }
 
     void btCustomActionPerformed(ActionEvent evt) {
-        objects.add(new Custom_object(new ArrayList<>(),new Point(0,0),((Barva) cbBarva.getSelectedItem()).color(),Boolean.parseBoolean(String.valueOf(xbFilled))));
+        System.out.println(xbFilled.getText());
+        objects.add(new Custom_object(new ArrayList<>(),new Point(0,0),((Barva) cbBarva.getSelectedItem()).color(),xbFilled.isSelected()));
         winCustom = new Custom_object_window(this, (Custom_object) objects.getLast());
         winCustom.setVisible(true);
         update_list();

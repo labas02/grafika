@@ -14,7 +14,6 @@ public class Custom_object extends GraphObject {
     public Custom_object(ArrayList<Object_node> nodes, Point pos, Color color,boolean filled) {
         super(pos,color, filled,3);
         this.nodes = nodes;
-        this.filled = filled;
         System.out.println(filled);
         find_center();
     }
