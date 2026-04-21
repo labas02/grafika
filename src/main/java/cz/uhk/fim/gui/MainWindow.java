@@ -187,7 +187,7 @@ public class MainWindow extends JFrame {
         public void mouseDragged(MouseEvent e){
             int px = e.getX();
             int py = e.getY();
-            System.out.println(objects.toString());
+
 
             int w = drawPanel.getWidth();
             int h = drawPanel.getHeight();
