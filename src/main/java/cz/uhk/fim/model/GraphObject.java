@@ -66,7 +66,7 @@ public abstract class GraphObject {
                 return "kruh";
             case 2:
                 return "ctverec";
-            case 4:
+            case 3:
                 return "custom";
         }
         return null;
